@@ -20,13 +20,11 @@ def return_graphs(file_data_list,path):
         check_code = CodeCheck.MyVisitor(code)
         check_code.errors[Errors.File_length_is_longer_then_200.value] = file_too_long
 
-        hist_filename = f"{filename}_hist.png"
-        print(f"datahist{filename}: {check_code.lengths}")
+        hist_filename = f"{filename[:filename.find('.')]}_hist.png"
         create_histogram(check_code.lengths, path + "\\" + hist_filename)
         output_filenames.append(hist_filename)
 
-        pie_filename = f"{filename}_pie.png"
-        print(f"valuespie{filename}: {check_code.errors}")
+        pie_filename = f"{filename[:filename.find('.')]}_pie.png"
         errors_without_0 = []
         errors_new = []
         for i in range(len(check_code.errors)):
@@ -62,9 +60,6 @@ def create_pie_chart(labels, values, filename):
     plt.close()
 
 def create_bar_chart(file_names, error_counts, filename):
-    for i in range(len(error_counts)):
-        print(f"valuesbar{file_names[i]}: {error_counts[i]}")
-    # print(f"Bar Chart - Files: {file_names}, Errors: {error_counts}")
     plt.figure()
     plt.bar(file_names, error_counts, color='green')
     plt.title('Number of issues per file')
