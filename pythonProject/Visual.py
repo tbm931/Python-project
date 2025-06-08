@@ -1,5 +1,4 @@
 import ast
-
 import matplotlib.pyplot as plt
 import CodeCheck
 from CodeCheck import Errors
@@ -44,7 +43,6 @@ def return_graphs(file_data_list,path):
     return output_filenames
 
 def create_histogram(data, filename):
-    plt.figure()
     plt.hist(data, bins=range(min(data), max(data)+2), color='blue', edgecolor='black', align='left')
     plt.title('Function lengths')
     plt.xlabel('Value')
@@ -69,16 +67,22 @@ def create_bar_chart(file_names, error_counts, filename):
     plt.close()
 
 def return_issues(code,filename):
+
+    if len(code.strip().splitlines()) > 200:
+        file_too_long = 1
+    else:
+        file_too_long = 0
+
+    tree = ast.parse(code)
+    CodeCheck.add_parents(tree)
     check_code = CodeCheck.MyVisitor(code)
-    sum_all_errors = 0
-    for item in check_code.errors:
-        sum_all_errors += item
-    if sum == 0:
-        return f"The file: {filename} is written in a correct format."
+    check_code.errors[Errors.File_length_is_longer_then_200.value] = file_too_long
     message = ""
     for i in range(len(check_code.errors)):
         if check_code.errors[i] == 1:
             message += f"You have {check_code.errors[i]} error of: {Errors(i).name.replace('_',' ')} \n"
         elif check_code.errors[i] > 1:
             message += f"You have {check_code.errors[i]} errors of: {Errors(i).name.replace('_', ' ')} \n"
-    return message
+    if not any(check_code.errors):
+        return {"message": f"The file is written in a correct format.", "lengths": check_code.lengths, "filename": filename}
+    return {"message": message, "lengths": check_code.lengths, "filename": filename}
